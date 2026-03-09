@@ -1,16 +1,32 @@
-app.get("/characters/search", async (req,res)=>{
+import { BrowserRouter,Routes,Route } from "react-router-dom"
 
-  const q = req.query.q
+import Home from "./pages/Home"
+import Character from "./pages/Character"
+import Chat from "./pages/Chat"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
-  const chars = await prisma.character.findMany({
-    where:{
-      name:{
-        contains:q,
-        mode:"insensitive"
-      }
-    }
-  })
+export default function App(){
 
-  res.json(chars)
+  return(
 
-})
+    <BrowserRouter>
+
+      <Routes>
+
+        <Route path="/" element={<Home/>}/>
+
+        <Route path="/character/:id" element={<Character/>}/>
+
+        <Route path="/chat/:id" element={<Chat/>}/>
+
+        <Route path="/login" element={<Login/>}/>
+
+        <Route path="/register" element={<Register/>}/>
+
+      </Routes>
+
+    </BrowserRouter>
+
+  )
+}

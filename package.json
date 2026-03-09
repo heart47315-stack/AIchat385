@@ -19,6 +19,8 @@
   "homepage": "https://github.com/heart47315-stack/AIchat385#readme",
   "dependencies": {
     "@prisma/client": "^7.4.2",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.5",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",

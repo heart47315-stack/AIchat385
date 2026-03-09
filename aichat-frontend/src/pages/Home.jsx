@@ -1,28 +1,71 @@
-import { useEffect, useState } from "react"
+import { useEffect,useState } from "react"
 import api from "../api/api"
 import CharacterCard from "../components/CharacterCard"
+import SearchBar from "../components/SearchBar"
+import BottomNav from "../components/BottomNav"
 
 export default function Home(){
 
   const [characters,setCharacters] = useState([])
+  const [search,setSearch] = useState("")
+  const [tag,setTag] = useState("All")
 
   useEffect(()=>{
+
     api.get("/characters").then(res=>{
       setCharacters(res.data)
     })
+
   },[])
 
+  const filtered = characters.filter(c=>{
+
+    const matchSearch =
+      c.name.toLowerCase().includes(search.toLowerCase())
+
+    const matchTag =
+      tag==="All" || c.tag===tag
+
+    return matchSearch && matchTag
+
+  })
+
   return(
-    <div>
 
-      <h2>Characters</h2>
+    <div className="page">
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:20}}>
-        {characters.map(c=>(
-          <CharacterCard key={c.id} character={c}/>
+      <SearchBar
+        value={search}
+        onChange={setSearch}
+      />
+
+      <div className="tags">
+
+        {["All","Love","Cute"].map(t=>(
+          <button
+            key={t}
+            onClick={()=>setTag(t)}
+          >
+            {t}
+          </button>
         ))}
+
       </div>
 
+      <div className="grid">
+
+        {filtered.map(c=>(
+          <CharacterCard
+            key={c.id}
+            character={c}
+          />
+        ))}
+
+      </div>
+
+      <BottomNav/>
+
     </div>
+
   )
 }

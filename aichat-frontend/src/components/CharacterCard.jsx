@@ -2,16 +2,26 @@ import { useNavigate } from "react-router-dom"
 
 export default function CharacterCard({character}){
 
-  const nav = useNavigate()
+  const navigate = useNavigate()
 
   return(
-    <div onClick={()=>nav("/character/"+character.id)}
-         style={{border:"1px solid #ccc",padding:10,cursor:"pointer"}}>
 
-      <img src={character.avatar} width="100%"/>
+    <div
+      className="card"
+      onClick={()=>navigate(`/character/${character.id}`)}
+    >
 
-      <h3>{character.name}</h3>
+      <img src={character.image}/>
+
+      <div className="card-name">
+        {character.name}
+      </div>
+
+      <div className="card-tag">
+        {character.tag}
+      </div>
 
     </div>
+
   )
 }
