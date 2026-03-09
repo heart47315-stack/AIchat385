@@ -1,34 +1,37 @@
 import { useParams } from "react-router-dom"
 import { useState } from "react"
-import api from "../api/api"
+import api from "../api/api.ts"
+import type { Message } from "../types"
 
 export default function Chat(){
 
   const {id} = useParams()
 
-  const [messages,setMessages] = useState([])
+  const [messages,setMessages] = useState<Message[]>([])
   const [input,setInput] = useState("")
 
   const send = async ()=>{
 
-    const userMsg = {
+    if(!input) return
+
+    const userMsg:Message = {
       role:"user",
       text:input
     }
 
-    setMessages([...messages,userMsg])
+    setMessages(prev=>[...prev,userMsg])
 
     const res = await api.post("/chat",{
       characterId:id,
       message:input
     })
 
-    const aiMsg = {
+    const aiMsg:Message = {
       role:"ai",
       text:res.data.reply
     }
 
-    setMessages(m=>[...m,aiMsg])
+    setMessages(prev=>[...prev,aiMsg])
 
     setInput("")
   }

@@ -1,21 +1,22 @@
 import { useParams,useNavigate } from "react-router-dom"
 import { useEffect,useState } from "react"
-import api from "../api/api"
+import api from "../api/api.ts"
+import type { Character as CharacterType } from "../types"
 
 export default function Character(){
 
   const {id} = useParams()
   const navigate = useNavigate()
 
-  const [character,setCharacter] = useState(null)
+  const [character,setCharacter] = useState<CharacterType | null>(null)
 
   useEffect(()=>{
 
-    api.get(`/characters/${id}`).then(res=>{
+    api.get(`/characters/${id}`).then((res)=>{
       setCharacter(res.data)
     })
 
-  },[])
+  },[id])
 
   if(!character) return <p>Loading...</p>
 
