@@ -1,5 +1,5 @@
-import { useEffect,useState } from "react"
-import api from "../api/api.ts"
+import { useEffect, useState } from "react"
+import api from "../api/api"
 import type { Character } from "../types"
 
 import CharacterCard from "../components/CharacterCard"
@@ -8,9 +8,9 @@ import BottomNav from "../components/BottomNav"
 
 export default function Home(){
 
-  const [characters,setCharacters] = useState<Character[]>([])
-  const [search,setSearch] = useState("")
-  const [tag,setTag] = useState("All")
+  const [characters, setCharacters] = useState<Character[]>([])
+  const [search, setSearch] = useState("")
+  const [tag, setTag] = useState("All")
 
   useEffect(()=>{
 
@@ -26,7 +26,7 @@ export default function Home(){
       c.name.toLowerCase().includes(search.toLowerCase())
 
     const matchTag =
-      tag==="All" || c.tag===tag
+      tag === "All" || c.tag === tag
 
     return matchSearch && matchTag
 

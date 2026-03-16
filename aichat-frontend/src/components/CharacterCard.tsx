@@ -1,6 +1,17 @@
 import { useNavigate } from "react-router-dom"
 
-export default function CharacterCard({character}){
+type Character = {
+  id: string
+  name: string
+  image: string
+  tag: string
+}
+
+type Props = {
+  character: Character
+}
+
+export default function CharacterCard({ character }: Props){
 
   const navigate = useNavigate()
 
