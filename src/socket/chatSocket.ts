@@ -1,17 +1,19 @@
-import { Server } from "socket.io"
+import { Server, Socket } from "socket.io"
 
-export const initChatSocket = (io: Server) => {
+export function initChatSocket(io: Server) {
 
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: Socket) => {
 
     console.log("User connected:", socket.id)
 
-    socket.on("send_message", (data) => {
-      io.emit("receive_message", data)
+    socket.on("chat message", (msg) => {
+      console.log("message:", msg)
+
+      io.emit("chat message", msg)
     })
 
     socket.on("disconnect", () => {
-      console.log("User disconnected")
+      console.log("User disconnected:", socket.id)
     })
 
   })

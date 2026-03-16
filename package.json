@@ -1,39 +1,22 @@
 {
   "name": "aichat",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/heart47315-stack/AIchat385.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/heart47315-stack/AIchat385/issues"
-  },
-  "homepage": "https://github.com/heart47315-stack/AIchat385#readme",
-  "dependencies": {
-    "@prisma/client": "^7.5.0",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.3.5",
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "socket.io": "^4.8.3"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma": "prisma studio"
   },
   "devDependencies": {
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "concurrently": "^9.2.1",
-    "prisma": "^7.5.0"
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
   }
 }
