@@ -14,8 +14,8 @@ model User {
   createdAt DateTime @default(now())
 
   characters Character[]
-  messages   Message[]
   chats      Chat[]
+  messages   Message[]
   follows    Follow[]
 }
 
