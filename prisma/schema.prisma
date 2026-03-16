@@ -7,34 +7,51 @@ generator client {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  username  String    @unique
-  email     String
-  password  String
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String
+  password String
+
+  // ความสัมพันธ์กับ Character
   characters Character[]
-  messages  Message[]
+
+  // ความสัมพันธ์กับ Message
+  messages Message[]
+
+  // ความสัมพันธ์กับ Follow (ผู้ใช้ follow ตัวละคร)
+  follows Follow[]
 }
 
 model Character {
-  id      Int    @id @default(autoincrement())
-  name    String
-  class   String
-  userId  Int
-  user    User   @relation(fields: [userId], references: [id])
+  id     Int    @id @default(autoincrement())
+  name   String
+  class  String
+  userId Int
+
+  // ความสัมพันธ์กับ User
+  user User @relation(fields: [userId], references: [id])
+
+  // ความสัมพันธ์กับ Follow (ตัวละครถูก follow โดยผู้ใช้)
+  followers Follow[]
 }
 
 model Message {
   id      Int    @id @default(autoincrement())
   content String
   userId  Int
-  user    User   @relation(fields: [userId], references: [id])
-}
-model Follow {
-  id Int @id @default(autoincrement())
 
-  userId Int
+  // ความสัมพันธ์กับ User
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Follow {
+  id          Int @id @default(autoincrement())
+  userId      Int
   characterId Int
 
-  user User @relation(fields:[userId],references:[id])
-  character Character @relation(fields:[characterId],references:[id])
+  // ความสัมพันธ์กับ User
+  user User @relation(fields: [userId], references: [id])
+
+  // ความสัมพันธ์กับ Character
+  character Character @relation(fields: [characterId], references: [id])
 }
