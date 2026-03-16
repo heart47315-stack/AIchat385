@@ -1,47 +1,61 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  email    String
-  password String
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 
-  // ความสัมพันธ์กับ Character
   characters Character[]
-
-  // ความสัมพันธ์กับ Message
-  messages Message[]
-
-  // ความสัมพันธ์กับ Follow (ผู้ใช้ follow ตัวละคร)
-  follows Follow[]
+  messages   Message[]
+  chats      Chat[]
+  follows    Follow[]
 }
 
 model Character {
-  id     Int    @id @default(autoincrement())
-  name   String
-  class  String
-  userId Int
+  id          Int      @id @default(autoincrement())
+  name        String
+  class       String
+  description String?
+  avatar      String?
+  userId      Int
+  createdAt   DateTime @default(now())
 
-  // ความสัมพันธ์กับ User
   user User @relation(fields: [userId], references: [id])
 
-  // ความสัมพันธ์กับ Follow (ตัวละครถูก follow โดยผู้ใช้)
+  chats     Chat[]
   followers Follow[]
 }
 
-model Message {
-  id      Int    @id @default(autoincrement())
-  content String
-  userId  Int
+model Chat {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  characterId Int
+  createdAt   DateTime @default(now())
 
-  // ความสัมพันธ์กับ User
-  user User @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  character Character @relation(fields: [characterId], references: [id])
+
+  messages Message[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  role      String
+  chatId    Int
+  userId    Int?
+  createdAt DateTime @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 }
 
 model Follow {
@@ -49,9 +63,8 @@ model Follow {
   userId      Int
   characterId Int
 
-  // ความสัมพันธ์กับ User
-  user User @relation(fields: [userId], references: [id])
-
-  // ความสัมพันธ์กับ Character
+  user      User      @relation(fields: [userId], references: [id])
   character Character @relation(fields: [characterId], references: [id])
+
+  @@unique([userId, characterId])
 }

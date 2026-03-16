@@ -18,10 +18,10 @@ export const createCharacter = async (req: Request, res: Response) => {
 
   const character = await prisma.character.create({
     data: {
-      name,
-      class: charClass,
-      userId
-    }
+  name,
+  tag: charClass,
+  userId
+}
   })
 
   res.json(character)
