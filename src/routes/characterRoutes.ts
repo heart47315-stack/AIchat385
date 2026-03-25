@@ -1,12 +1,9 @@
-import express from "express"
-import {
-  getCharacters,
-  createCharacter
-} from "../controllers/characterController"
+import { Router } from "express";
+import { getCharacters, createCharacter } from "../controllers/characterController";
 
-const router = express.Router()
+const router = Router();
 
-router.get("/", getCharacters)
-router.post("/", createCharacter)
+router.get("/", getCharacters);
+router.post("/", createCharacter);
 
-export default router
+export default router;

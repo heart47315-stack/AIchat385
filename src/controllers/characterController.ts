@@ -1,28 +1,38 @@
-import { Request, Response } from "express"
-import { PrismaClient } from "@prisma/client"
+import { Request, Response } from "express";
+import { prisma } from "../lib/prisma";
 
-const prisma = new PrismaClient()
-
+// GET all characters
 export const getCharacters = async (req: Request, res: Response) => {
+  try {
+    const characters = await prisma.character.findMany({
+      include: { user: true }
+    });
 
-  const characters = await prisma.character.findMany({
-    include: { user: true }
-  })
+    res.json(characters);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching characters" });
+  }
+};
 
-  res.json(characters)
-}
-
+// CREATE character
 export const createCharacter = async (req: Request, res: Response) => {
+  try {
+    const { name, class: charClass, description, avatar, userId } = req.body;
 
-  const { name, tag, userId } = req.body;
+    const character = await prisma.character.create({
+      data: {
+        name,
+        class: charClass,
+        description,
+        avatar,
+        userId
+      }
+    });
 
-  const character = await prisma.character.create({
-    data: {
-      name,
-      tag,
-      userId
-    }
-  });
-
-  res.json(character);
-}
+    res.json(character);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error creating character" });
+  }
+};

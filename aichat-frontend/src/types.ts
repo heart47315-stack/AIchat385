@@ -1,12 +1,8 @@
 export interface Character {
-  id: string
-  name: string
-  description: string
-  image: string
-  tag: string
-}
-
-export interface Message {
-  role: "user" | "ai"
-  text: string
+  id: number;
+  name: string;
+  description?: string;
+  avatar?: string;
+  class: string;
+  userId: number;
 }

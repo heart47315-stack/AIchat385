@@ -1,38 +1,33 @@
-import { useNavigate } from "react-router-dom"
-
-type Character = {
-  id: string
-  name: string
-  image: string
-  tag: string
-}
+import { useNavigate } from "react-router-dom";
+import type { Character } from "../types";
 
 type Props = {
-  character: Character
-}
+  character: Character;
+};
 
-export default function CharacterCard({ character }: Props){
+export default function CharacterCard({ character }: Props) {
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  return(
-
+  return (
     <div
       className="card"
-      onClick={()=>navigate(`/character/${character.id}`)}
+      onClick={() => navigate(`/character/${character.id}`)}
     >
 
-      <img src={character.image}/>
+      <img
+        src={character.avatar || "https://via.placeholder.com/150"}
+        alt={character.name}
+      />
 
       <div className="card-name">
         {character.name}
       </div>
 
-      <div className="card-tag">
-        {character.tag}
+      <div className="card-class">
+        {character.class}
       </div>
 
     </div>
-
-  )
+  );
 }

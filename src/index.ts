@@ -1,37 +1,21 @@
-import "dotenv/config"
+import express from "express";
+import cors from "cors";
+import characterRoutes from "./routes/characterRoutes";
 
-import express from "express"
-import cors from "cors"
-import http from "http"
-import { Server } from "socket.io"
+const app = express();
 
-import authRoutes from "./routes/authRoutes"
-import characterRoutes from "./routes/characterRoutes"
-import chatRoutes from "./routes/chatRoutes"
+// ✅ แก้ปัญหา req.body ใช้งานไม่ได้
+app.use(express.json());
 
-import { initChatSocket } from "./socket/chatSocket"
+// ✅ กัน CORS (frontend เรียกได้)
+app.use(cors());
 
-const app = express()
+// ✅ route
+app.use("/api/characters", characterRoutes);
 
-app.use(cors())
-app.use(express.json())
+// ✅ start server
+const PORT = process.env.PORT || 5000;
 
-app.use("/api/auth", authRoutes)
-app.use("/api/characters", characterRoutes)
-app.use("/api/chat", chatRoutes)
-
-app.get("/", (req, res) => {
-  res.send("AI Chat Backend Running")
-})
-
-const server = http.createServer(app)
-
-const io = new Server(server, {
-  cors: { origin: "*" }
-})
-
-initChatSocket(io)
-
-server.listen(3000, () => {
-  console.log("Server running on port 3000")
-})
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
