@@ -25,8 +25,9 @@ export default function Home(){
     const matchSearch =
       c.name.toLowerCase().includes(search.toLowerCase())
 
+    // Use 'tag' property for filtering
     const matchTag =
-      tag==="All" || c.tag===tag
+      tag === "All" || c.tag === tag
 
     return matchSearch && matchTag
 

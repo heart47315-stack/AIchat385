@@ -12,12 +12,13 @@ export const getMessages = async (req: Request, res: Response) => {
 }
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const { content, userId } = req.body
+  const { content, chatId, role } = req.body
 
   const message = await prisma.message.create({
     data: {
       content,
-      userId
+      chatId,
+      role
     }
   })
 

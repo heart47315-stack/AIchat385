@@ -14,15 +14,15 @@ export const getCharacters = async (req: Request, res: Response) => {
 
 export const createCharacter = async (req: Request, res: Response) => {
 
-  const { name, class: charClass, userId } = req.body
+  const { name, tag, userId } = req.body;
 
   const character = await prisma.character.create({
     data: {
-  name,
-  tag: charClass,
-  userId
-}
-  })
+      name,
+      tag,
+      userId
+    }
+  });
 
-  res.json(character)
+  res.json(character);
 }
