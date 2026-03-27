@@ -13,13 +13,24 @@ export default function Home() {
   const [selectedClass, setSelectedClass] = useState("All");
 
   useEffect(() => {
-    api.get("/characters").then((res) => {
-      setCharacters(res.data);
-    });
+    console.log("🔵 Home mounted");
+
+    const fetchCharacters = async () => {
+      try {
+        const res = await api.get("/characters");
+        console.log("✅ API RESPONSE:", res.data);
+
+        setCharacters(res.data);
+      } catch (err) {
+        console.error("❌ API ERROR:", err);
+      }
+    };
+
+    fetchCharacters();
+
   }, []);
 
   const filtered = characters.filter((c) => {
-
     const matchSearch =
       c.name.toLowerCase().includes(search.toLowerCase());
 
@@ -27,7 +38,6 @@ export default function Home() {
       selectedClass === "All" || c.class === selectedClass;
 
     return matchSearch && matchClass;
-
   });
 
   return (
