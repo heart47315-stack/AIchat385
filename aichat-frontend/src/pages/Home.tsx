@@ -1,75 +1,38 @@
-import { useEffect, useState } from "react";
-import api from "../api/api";
-import type { Character } from "../types";
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import CharacterCard from "../components/CharacterCard";
-import SearchBar from "../components/SearchBar";
-import BottomNav from "../components/BottomNav";
+import Home from "./pages/Home"
+import Character from "./pages/Character"
+import Chat from "./pages/Chat"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
-export default function Home() {
+// (ถ้ามีหน้าเพิ่มในอนาคตค่อย import)
+// import Favorites from "./pages/Favorites"
+// import Profile from "./pages/Profile"
 
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [search, setSearch] = useState("");
-  const [selectedClass, setSelectedClass] = useState("All");
-
-  useEffect(() => {
-    console.log("🔵 Home mounted");
-
-    const fetchCharacters = async () => {
-      try {
-        const res = await api.get("/characters");
-        console.log("✅ API RESPONSE:", res.data);
-
-        setCharacters(res.data);
-      } catch (err) {
-        console.error("❌ API ERROR:", err);
-      }
-    };
-
-    fetchCharacters();
-
-  }, []);
-
-  const filtered = characters.filter((c) => {
-    const matchSearch =
-      c.name.toLowerCase().includes(search.toLowerCase());
-
-    const matchClass =
-      selectedClass === "All" || c.class === selectedClass;
-
-    return matchSearch && matchClass;
-  });
-
+function App() {
   return (
-    <div className="page">
+    <BrowserRouter>
+      <Routes>
+        {/* หน้าแรก */}
+        <Route path="/" element={<Home />} />
 
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-      />
+        {/* Character */}
+        <Route path="/character/:id" element={<Character />} />
 
-      <div className="tasks">
-        {["All", "Warrior", "Mage", "Love", "Cute"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setSelectedClass(t)}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+        {/* Chat รองรับทั้งมี id และไม่มี id */}
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:id" element={<Chat />} />
 
-      <div className="grid">
-        {filtered.map((c) => (
-          <CharacterCard
-            key={c.id}
-            character={c}
-          />
-        ))}
-      </div>
+        {/* Auth */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      <BottomNav />
-
-    </div>
-  );
+        {/* กันหลง route */}
+        <Route path="*" element={<h1>404 Not Found</h1>} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
+
+export default App
