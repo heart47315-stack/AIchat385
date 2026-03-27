@@ -1,38 +1,48 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { useState } from "react"
+import { Link } from "react-router-dom"
 
-import Home from "./pages/Home"
-import Character from "./pages/Character"
-import Chat from "./pages/Chat"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
+const characters = [
+  { id: 1, name: "Demon", img: "https://picsum.photos/200?1" },
+  { id: 2, name: "Ghost", img: "https://picsum.photos/200?2" },
+  { id: 3, name: "Dark Boy", img: "https://picsum.photos/200?3" },
+  { id: 4, name: "Vampire", img: "https://picsum.photos/200?4" },
+]
 
-// (ถ้ามีหน้าเพิ่มในอนาคตค่อย import)
-// import Favorites from "./pages/Favorites"
-// import Profile from "./pages/Profile"
+export default function Home() {
+  const [search, setSearch] = useState("")
 
-function App() {
+  const filtered = characters.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  )
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* หน้าแรก */}
-        <Route path="/" element={<Home />} />
+    <div className="bg-[#6b5b5b] min-h-screen p-4 text-white pb-20">
 
-        {/* Character */}
-        <Route path="/character/:id" element={<Character />} />
+      {/* 🔍 Search */}
+      <input
+        className="w-full p-3 rounded-full text-black mb-3"
+        placeholder="Search..."
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-        {/* Chat รองรับทั้งมี id และไม่มี id */}
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/chat/:id" element={<Chat />} />
+      {/* 🎭 Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {filtered.map(c => (
+          <Link to={`/character/${c.id}`} key={c.id}>
+            <div className="bg-white rounded-xl overflow-hidden">
+              <img src={c.img} className="w-full h-40 object-cover" />
+              <p className="text-black text-center py-2">{c.name}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
 
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* กันหลง route */}
-        <Route path="*" element={<h1>404 Not Found</h1>} />
-      </Routes>
-    </BrowserRouter>
+      {/* 📱 Bottom Nav */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white text-black flex justify-around py-3">
+        <Link to="/">🏠</Link>
+        <Link to="/chat">💬</Link>
+        <Link to="/login">👤</Link>
+      </div>
+    </div>
   )
 }
-
-export default App

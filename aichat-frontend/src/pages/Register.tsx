@@ -1,50 +1,18 @@
-import { useState } from "react"
-import api from "../api/api.ts"
+import { useNavigate } from "react-router-dom"
 
-export default function Register(){
+export default function Register() {
+  const navigate = useNavigate()
 
-  const [username,setUsername] = useState("")
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+  return (
+    <div className="bg-[#6b5b5b] min-h-screen flex flex-col justify-center items-center text-white">
+      <h1 className="mb-4">Register</h1>
 
-  const register = async ()=>{
-
-    await api.post("/auth/register",{
-      username,
-      email,
-      password
-    })
-
-    alert("register success")
-  }
-
-  return(
-
-    <div className="formPage">
-
-      <h2>Register</h2>
-
-      <input
-        placeholder="username"
-        onChange={e=>setUsername(e.target.value)}
-      />
-
-      <input
-        placeholder="email"
-        onChange={e=>setEmail(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="password"
-        onChange={e=>setPassword(e.target.value)}
-      />
-
-      <button onClick={register}>
-        Register
+      <button
+        className="bg-white text-black px-4 py-2 rounded"
+        onClick={() => navigate("/login")}
+      >
+        Go to Login
       </button>
-
     </div>
-
   )
 }

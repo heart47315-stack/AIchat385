@@ -1,48 +1,18 @@
-import { useState } from "react"
-import api from "../api/api.ts"
 import { useNavigate } from "react-router-dom"
 
-export default function Login(){
-
+export default function Login() {
   const navigate = useNavigate()
 
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+  return (
+    <div className="bg-[#6b5b5b] min-h-screen flex flex-col justify-center items-center text-white">
+      <h1 className="mb-4">Login</h1>
 
-  const login = async ()=>{
-
-    const res = await api.post("/auth/login",{
-      email,
-      password
-    })
-
-    localStorage.setItem("token",res.data.token)
-
-    navigate("/")
-  }
-
-  return(
-
-    <div className="formPage">
-
-      <h2>Login</h2>
-
-      <input
-        placeholder="email"
-        onChange={e=>setEmail(e.target.value)}
-      />
-
-      <input
-        type="password"
-        placeholder="password"
-        onChange={e=>setPassword(e.target.value)}
-      />
-
-      <button onClick={login}>
+      <button
+        className="bg-white text-black px-4 py-2 rounded"
+        onClick={() => navigate("/chat")}
+      >
         Login
       </button>
-
     </div>
-
   )
 }
