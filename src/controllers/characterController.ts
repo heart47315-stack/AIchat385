@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { prisma } from "../lib/prisma";
+import prisma from "../lib/prisma";
 
 // GET all characters
 export const getCharacters = async (req: Request, res: Response) => {
   try {
     const characters = await prisma.character.findMany({
-      include: { user: true }
+      include: { user: true },
     });
 
     res.json(characters);
@@ -26,8 +26,8 @@ export const createCharacter = async (req: Request, res: Response) => {
         class: charClass,
         description,
         avatar,
-        userId
-      }
+        userId,
+      },
     });
 
     res.json(character);
