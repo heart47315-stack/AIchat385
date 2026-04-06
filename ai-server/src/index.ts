@@ -1,19 +1,18 @@
 import express from "express";
 import cors from "cors";
-import characterRoutes from "./routes/characterRoutes";
+import dotenv from "dotenv";
+import chatRoutes from "./routes/chatRoutes";
+
+dotenv.config();
 
 const app = express();
 
-// ✅ แก้ปัญหา req.body ใช้งานไม่ได้
+app.use(cors());
 app.use(express.json());
 
-// ✅ กัน CORS (frontend เรียกได้)
-app.use(cors());
+// routes
+app.use("/api/chat", chatRoutes);
 
-// ✅ route
-app.use("/api/characters", characterRoutes);
-
-// ✅ start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

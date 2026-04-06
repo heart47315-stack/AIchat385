@@ -1,26 +1,57 @@
-import { Request, Response } from "express"
-import { PrismaClient } from "@prisma/client"
+import { Request, Response } from "express";
+import OpenAI from "openai";
 
-const prisma = new PrismaClient()
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-export const getMessages = async (req: Request, res: Response) => {
-  const messages = await prisma.message.findMany({
-    include: { user: true }
-  })
-
-  res.json(messages)
-}
+// เก็บ memory ชั่วคราว (ต่อ user)
+const memory = new Map<string, any[]>();
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const { content, chatId, role } = req.body
+  try {
+    const { message } = req.body;
+    const userId = "user1";
 
-  const message = await prisma.message.create({
-    data: {
-      content,
-      chatId,
-      role
+    if (!memory.has(userId)) {
+      memory.set(userId, []);
     }
-  })
 
-  res.json(message)
-}
+    const history = memory.get(userId)!;
+
+    history.push({
+      role: "user",
+      content: message,
+    });
+
+    // จำกัด memory
+    if (history.length > 10) {
+      history.shift();
+    }
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "คุณคือ AI ที่พูดเหมือนมนุษย์ เป็นกันเอง ฉลาด มีอารมณ์ และจำบทสนทนาได้",
+        },
+        ...history,
+      ],
+    });
+
+    const reply = completion.choices[0].message.content;
+
+    history.push({
+      role: "assistant",
+      content: reply,
+    });
+
+    res.json({ reply });
+
+  } catch (error: any) {
+    console.error("AI ERROR:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};

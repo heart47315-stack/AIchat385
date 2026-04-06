@@ -1,103 +1,124 @@
-import { useParams, useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 
-// 📌 กำหนด type ของ message (แก้ error หลัก!)
 type Message = {
-  text: string
-  sender: "user" | "ai"
-}
+  role: "user" | "assistant";
+  content: string;
+};
 
 export default function Chat() {
-  // 📌 รับ id จาก URL เช่น /chat/1
-  const { id } = useParams()
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(false);
 
-  // 📌 ใช้เปลี่ยนหน้า
-  const navigate = useNavigate()
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // 📌 state เก็บข้อความทั้งหมด
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "สวัสดี 👋", sender: "ai" }
-  ])
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  // 📌 state เก็บ input
-  const [input, setInput] = useState("")
+  const typeMessage = (text: string) => {
+    let i = 0;
+    setTyping(true);
 
-  // 📌 ฟังก์ชันส่งข้อความ
-  const sendMessage = () => {
-    if (!input.trim()) return // ❌ กันส่งค่าว่าง
+    const interval = setInterval(() => {
+      i++;
 
-    // ✅ เพิ่มข้อความ user
-    const newMessages: Message[] = [
-      ...messages,
-      { text: input, sender: "user" }
-    ]
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1].content = text.slice(0, i);
+        return updated;
+      });
 
-    setMessages(newMessages)
-    setInput("") // เคลียร์ input
+      if (i >= text.length) {
+        clearInterval(interval);
+        setTyping(false);
+      }
+    }, 15);
+  };
 
-    // 🤖 mock AI ตอบกลับ
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { text: "ตอบกลับ: " + input, sender: "ai" }
-      ])
-    }, 500)
-  }
+  const sendMessage = async () => {
+    if (!input.trim() || typing) return;
+
+    const userMsg: Message = {
+      role: "user",
+      content: input,
+    };
+
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      { role: "assistant", content: "" },
+    ]);
+
+    setInput("");
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/chat", {
+        message: input,
+      });
+
+      typeMessage(res.data.reply);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <div className="h-screen flex flex-col bg-black text-white">
+    <div className="h-screen flex flex-col bg-[#1a1a1a] text-white">
 
-      {/* 🔙 Header */}
-      <div className="p-3 flex items-center gap-2 bg-[#2f2a2a]">
-        <button onClick={() => navigate(-1)}>⬅</button>
-        <h1>Character {id}</h1>
-      </div>
-
-      {/* 💬 Chat Area */}
-      <div
-        className="flex-1 p-3 overflow-y-auto flex flex-col gap-3"
-        style={{
-          backgroundImage: `url(https://picsum.photos/400?${id})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* 🔥 overlay ดำ */}
-        <div className="bg-black/50 p-3 rounded-xl flex flex-col gap-3">
-
-          {/* 🧠 วนลูปแสดงข้อความ */}
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`max-w-[70%] p-3 rounded-xl ${
-                msg.sender === "user"
-                  ? "bg-white text-black self-end"
-                  : "bg-[#d1d1d1] text-black self-start"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
-
+      {/* HEADER */}
+      <div className="flex items-center gap-3 p-4 border-b border-gray-800">
+        <img src="https://i.pravatar.cc/40" className="w-10 h-10 rounded-full" />
+        <div>
+          <div className="font-semibold">AI Character</div>
+          <div className="text-sm text-gray-400">
+            {typing ? "กำลังพิมพ์..." : "ออนไลน์"}
+          </div>
         </div>
       </div>
 
-      {/* ✏️ Input */}
-      <div className="p-3 bg-[#2f2a2a] flex gap-2">
+      {/* CHAT */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${
+              msg.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`px-4 py-2 rounded-2xl max-w-xs text-sm shadow
+              ${
+                msg.role === "user"
+                  ? "bg-blue-500 rounded-br-none"
+                  : "bg-gray-700 rounded-bl-none"
+              }`}
+            >
+              {msg.content}
+            </div>
+          </div>
+        ))}
+
+        <div ref={bottomRef} />
+      </div>
+
+      {/* INPUT */}
+      <div className="p-3 border-t border-gray-800 flex gap-2">
         <input
+          className="flex-1 bg-gray-800 px-4 py-2 rounded-full outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="พิมพ์ข้อความ..."
-          className="flex-1 p-2 rounded-full text-black"
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
-
         <button
           onClick={sendMessage}
-          className="bg-white text-black px-4 rounded-full"
+          className="bg-blue-500 px-4 rounded-full"
         >
           ส่ง
         </button>
       </div>
     </div>
-  )
+  );
 }
