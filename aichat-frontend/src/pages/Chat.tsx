@@ -1,124 +1,68 @@
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import { useState } from "react"
+import { useParams } from "react-router-dom"
 
 type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+  text: string
+  sender: "user" | "ai"
+}
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const typeMessage = (text: string) => {
-    let i = 0;
-    setTyping(true);
-
-    const interval = setInterval(() => {
-      i++;
-
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1].content = text.slice(0, i);
-        return updated;
-      });
-
-      if (i >= text.length) {
-        clearInterval(interval);
-        setTyping(false);
-      }
-    }, 15);
-  };
+  const { id } = useParams()
+  const [messages, setMessages] = useState<Message[]>([
+    { text: "สวัสดี 👋 ฉันคือ AI เพื่อนคุยของคุณ", sender: "ai" }
+  ])
+  const [input, setInput] = useState("")
 
   const sendMessage = async () => {
-    if (!input.trim() || typing) return;
+    if (!input.trim()) return
 
-    const userMsg: Message = {
-      role: "user",
-      content: input,
-    };
+    const newMessage: Message = { text: input, sender: "user" }
+    setMessages((prev) => [...prev, newMessage])
 
-    setMessages((prev) => [
-      ...prev,
-      userMsg,
-      { role: "assistant", content: "" },
-    ]);
+    const res = await fetch("http://localhost:5000/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input }),
+    })
+    const data = await res.json()
 
-    setInput("");
-
-    try {
-      const res = await axios.post("http://localhost:5000/api/chat", {
-        message: input,
-      });
-
-      typeMessage(res.data.reply);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    setMessages((prev) => [...prev, { text: data.reply, sender: "ai" }])
+    setInput("")
+  }
 
   return (
-    <div className="h-screen flex flex-col bg-[#1a1a1a] text-white">
+    <div className="flex flex-col h-screen bg-[#1f2937] text-white p-4">
+      <h1 className="text-xl font-bold mb-4">ห้องแชท #{id}</h1>
 
-      {/* HEADER */}
-      <div className="flex items-center gap-3 p-4 border-b border-gray-800">
-        <img src="https://i.pravatar.cc/40" className="w-10 h-10 rounded-full" />
-        <div>
-          <div className="font-semibold">AI Character</div>
-          <div className="text-sm text-gray-400">
-            {typing ? "กำลังพิมพ์..." : "ออนไลน์"}
-          </div>
-        </div>
-      </div>
-
-      {/* CHAT */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg, i) => (
+      {/* 🗨️ แสดงข้อความ */}
+      <div className="flex-1 overflow-y-auto space-y-2">
+        {messages.map((m, i) => (
           <div
             key={i}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
+            className={`p-2 rounded-lg max-w-xs ${
+              m.sender === "user" ? "bg-blue-500 ml-auto" : "bg-gray-700"
             }`}
           >
-            <div
-              className={`px-4 py-2 rounded-2xl max-w-xs text-sm shadow
-              ${
-                msg.role === "user"
-                  ? "bg-blue-500 rounded-br-none"
-                  : "bg-gray-700 rounded-bl-none"
-              }`}
-            >
-              {msg.content}
-            </div>
+            {m.text}
           </div>
         ))}
-
-        <div ref={bottomRef} />
       </div>
 
-      {/* INPUT */}
-      <div className="p-3 border-t border-gray-800 flex gap-2">
+      {/* ✍️ กล่อง input */}
+      <div className="flex mt-2">
         <input
-          className="flex-1 bg-gray-800 px-4 py-2 rounded-full outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          className="flex-1 p-2 rounded-l-lg text-black"
           placeholder="พิมพ์ข้อความ..."
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
         <button
           onClick={sendMessage}
-          className="bg-blue-500 px-4 rounded-full"
+          className="bg-green-500 px-4 rounded-r-lg"
         >
           ส่ง
         </button>
       </div>
     </div>
-  );
+  )
 }

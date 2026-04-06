@@ -4,9 +4,12 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": false,
-    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"]
 }
