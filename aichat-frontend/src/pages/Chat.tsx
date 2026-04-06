@@ -1,125 +1,101 @@
-import { useParams } from "react-router-dom"
-import { useState, useRef, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { useState } from "react"
 
+// 📌 กำหนด type ของ message (แก้ error หลัก!)
 type Message = {
   text: string
   sender: "user" | "ai"
 }
 
 export default function Chat() {
+  // 📌 รับ id จาก URL เช่น /chat/1
   const { id } = useParams()
-  const [messages, setMessages] = useState<Message[]>([])
+
+  // 📌 ใช้เปลี่ยนหน้า
+  const navigate = useNavigate()
+
+  // 📌 state เก็บข้อความทั้งหมด
+  const [messages, setMessages] = useState<Message[]>([
+    { text: "สวัสดี 👋", sender: "ai" }
+  ])
+
+  // 📌 state เก็บ input
   const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
 
-  const bottomRef = useRef<HTMLDivElement>(null)
+  // 📌 ฟังก์ชันส่งข้อความ
+  const sendMessage = () => {
+    if (!input.trim()) return // ❌ กันส่งค่าว่าง
 
-  // 🔥 auto scroll
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    // ✅ เพิ่มข้อความ user
+    const newMessages: Message[] = [
+      ...messages,
+      { text: input, sender: "user" }
+    ]
 
-  // 💾 โหลดแชทเก่า
-  useEffect(() => {
-    const saved = localStorage.getItem("chat")
-    if (saved) setMessages(JSON.parse(saved))
-  }, [])
+    setMessages(newMessages)
+    setInput("") // เคลียร์ input
 
-  // 💾 save แชท
-  useEffect(() => {
-    localStorage.setItem("chat", JSON.stringify(messages))
-  }, [messages])
-
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return
-
-    const userMessage: Message = {
-      text: input,
-      sender: "user"
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    setInput("")
-    setLoading(true)
-
-    try {
-      const res = await fetch("http://localhost:3000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: input,
-          characterId: id,
-          sessionId: "user1"
-        })
-      })
-
-      const data = await res.json()
-
-      const aiMessage: Message = {
-        text: data.reply,
-        sender: "ai"
-      }
-
-      setMessages(prev => [...prev, aiMessage])
-
-    } catch {
-      setMessages(prev => [
+    // 🤖 mock AI ตอบกลับ
+    setTimeout(() => {
+      setMessages((prev) => [
         ...prev,
-        { text: "❌ AI error", sender: "ai" }
+        { text: "ตอบกลับ: " + input, sender: "ai" }
       ])
-    }
-
-    setLoading(false)
+    }, 500)
   }
 
   return (
-    <div className="bg-[#6b5b5b] min-h-screen text-white flex flex-col">
+    <div className="h-screen flex flex-col bg-black text-white">
 
-      <h1 className="p-3 border-b text-center font-bold">
-        Chat with {id || "AI"}
-      </h1>
-
-      <div className="flex-1 p-3 space-y-2 overflow-y-auto flex flex-col">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`max-w-[70%] p-2 rounded-lg ${
-              m.sender === "user"
-                ? "bg-indigo-500 self-end"
-                : "bg-white text-black self-start"
-            }`}
-          >
-            {m.text}
-          </div>
-        ))}
-
-        {loading && (
-          <div className="bg-white text-black p-2 rounded-lg self-start">
-            AI is typing...
-          </div>
-        )}
-
-        <div ref={bottomRef} />
+      {/* 🔙 Header */}
+      <div className="p-3 flex items-center gap-2 bg-[#2f2a2a]">
+        <button onClick={() => navigate(-1)}>⬅</button>
+        <h1>Character {id}</h1>
       </div>
 
-      <div className="p-3 flex gap-2 bg-[#5a4c4c]">
+      {/* 💬 Chat Area */}
+      <div
+        className="flex-1 p-3 overflow-y-auto flex flex-col gap-3"
+        style={{
+          backgroundImage: `url(https://picsum.photos/400?${id})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* 🔥 overlay ดำ */}
+        <div className="bg-black/50 p-3 rounded-xl flex flex-col gap-3">
+
+          {/* 🧠 วนลูปแสดงข้อความ */}
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`max-w-[70%] p-3 rounded-xl ${
+                msg.sender === "user"
+                  ? "bg-white text-black self-end"
+                  : "bg-[#d1d1d1] text-black self-start"
+              }`}
+            >
+              {msg.text}
+            </div>
+          ))}
+
+        </div>
+      </div>
+
+      {/* ✏️ Input */}
+      <div className="p-3 bg-[#2f2a2a] flex gap-2">
         <input
-          className="flex-1 p-2 rounded text-black"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage()
-          }}
+          placeholder="พิมพ์ข้อความ..."
+          className="flex-1 p-2 rounded-full text-black"
         />
 
         <button
           onClick={sendMessage}
-          disabled={loading}
-          className="bg-indigo-500 px-4 rounded"
+          className="bg-white text-black px-4 rounded-full"
         >
-          Send
+          ส่ง
         </button>
       </div>
     </div>
