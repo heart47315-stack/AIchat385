@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ES2020",                       // ใช้ฟีเจอร์ JS ถึง ES2020
-    "module": "commonjs",                     // ใช้ CommonJS (เหมาะกับ Node.js)
-    "moduleResolution": "node",               // วิธี resolve module แบบ Node
-    "esModuleInterop": true,                  // import default จาก CommonJS ได้
-    "allowSyntheticDefaultImports": true,     // import default จาก CommonJS ได้สะดวกขึ้น
-    "resolveJsonModule": true,                // import ไฟล์ .json ได้
-    "outDir": "dist",                         // โฟลเดอร์ที่เก็บไฟล์ build
-    "strict": true,                           // เปิด strict mode ตรวจ error มากขึ้น
-    "skipLibCheck": true,                     // ข้ามการตรวจสอบ type ของ library
-    "forceConsistentCasingInFileNames": true  // ป้องกันปัญหา case-sensitive บน Linux
+    "target": "ES2020",
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+
+    "strict": true,
+    "skipLibCheck": true,
+
+    "types": ["node"],
+    "lib": ["ES2020"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "prisma", "*.config.ts"]
 }

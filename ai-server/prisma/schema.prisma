@@ -29,7 +29,7 @@ model Character {
   userId      Int
   createdAt   DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   chats     Chat[]
   followers Follow[]
@@ -41,8 +41,8 @@ model Chat {
   characterId Int
   createdAt   DateTime @default(now())
 
-  user      User      @relation(fields: [userId], references: [id])
-  character Character @relation(fields: [characterId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   messages Message[]
 }
@@ -55,8 +55,8 @@ model Message {
   userId    Int?
   createdAt DateTime @default(now())
 
-  chat Chat @relation(fields: [chatId], references: [id])
-  user User? @relation(fields: [userId], references: [id])
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Follow {
@@ -64,8 +64,8 @@ model Follow {
   userId      Int
   characterId Int
 
-  user      User      @relation(fields: [userId], references: [id])
-  character Character @relation(fields: [characterId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([userId, characterId])
 }
