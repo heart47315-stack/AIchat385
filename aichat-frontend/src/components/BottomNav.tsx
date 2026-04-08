@@ -10,15 +10,22 @@ export default function BottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-[#2f2a2a] flex justify-around items-center py-3 rounded-t-2xl shadow-xl">
 
+      {/* 🔙 Back */}
+      <button onClick={() => navigate(-1)} className="text-gray-300">
+        ⬅️
+      </button>
+
+      {/* 🏠 Home */}
       <button onClick={() => navigate("/")} className={active("/")}>
         🏠
       </button>
 
-      <button onClick={() => navigate("/chat")} className={active("/chat")}>
+      {/* 💬 Chat */}
+      <button onClick={() => navigate("/chat/1")} className={active("/chat/1")}>
         💬
       </button>
 
-      {/* 🔥 ปุ่มกลางลอย */}
+      {/* 🔥 Floating Center Button */}
       <button
         onClick={() => navigate("/create")}
         className="bg-white text-black w-14 h-14 rounded-full text-2xl flex items-center justify-center -mt-8 shadow-lg"
@@ -26,10 +33,15 @@ export default function BottomNav() {
         +
       </button>
 
+      {/* 👤 Profile */}
       <button onClick={() => navigate("/profile")} className={active("/profile")}>
         👤
       </button>
 
+      {/* ➡️ Forward */}
+      <button onClick={() => navigate(1)} className="text-gray-300">
+        ➡️
+      </button>
     </div>
   )
 }
