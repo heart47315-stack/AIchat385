@@ -1,46 +1,54 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
-
-type Message = {
-  text: string
-  sender: "user" | "ai"
-}
+import api from "../api/api"
 
 export default function Chat() {
-  const { id } = useParams()
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "สวัสดี 👋 ฉันคือ AI เพื่อนคุยของคุณ", sender: "ai" }
-  ])
   const [input, setInput] = useState("")
+  const [messages, setMessages] = useState<any[]>([])
 
   const sendMessage = async () => {
     if (!input.trim()) return
 
-    const newMessage: Message = { text: input, sender: "user" }
-    setMessages((prev) => [...prev, newMessage])
+    const userMessage = input
 
-    const res = await fetch("http://localhost:5000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input }),
-    })
-    const data = await res.json()
+    setMessages(prev => [
+      ...prev,
+      { text: userMessage, sender: "user" }
+    ])
 
-    setMessages((prev) => [...prev, { text: data.reply, sender: "ai" }])
     setInput("")
+
+    try {
+      const res = await api.post("/chat", {
+        message: userMessage,
+        userId: 1
+      })
+
+      setMessages(prev => [
+        ...prev,
+        { text: res.data.reply, sender: "ai" }
+      ])
+    } catch {
+      alert("ส่งข้อความไม่สำเร็จ")
+    }
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#1f2937] text-white p-4">
-      <h1 className="text-xl font-bold mb-4">ห้องแชท #{id}</h1>
+    <div className="min-h-screen bg-[#6b5c5c] text-white flex flex-col">
+      
+      {/* Header */}
+      <div className="p-4 text-xl font-bold border-b border-gray-500">
+        ห้องแชท AI
+      </div>
 
-      {/* 🗨️ แสดงข้อความ */}
-      <div className="flex-1 overflow-y-auto space-y-2">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`p-2 rounded-lg max-w-xs ${
-              m.sender === "user" ? "bg-blue-500 ml-auto" : "bg-gray-700"
+            className={`p-3 rounded-2xl max-w-[70%] ${
+              m.sender === "user"
+                ? "bg-white text-black ml-auto"
+                : "bg-[#5a4d4d]"
             }`}
           >
             {m.text}
@@ -48,17 +56,17 @@ export default function Chat() {
         ))}
       </div>
 
-      {/* ✍️ กล่อง input */}
-      <div className="flex mt-2">
+      {/* Input */}
+      <div className="p-4 flex gap-2">
         <input
+          className="flex-1 p-3 rounded-full text-black"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 p-2 rounded-l-lg text-black"
           placeholder="พิมพ์ข้อความ..."
         />
         <button
           onClick={sendMessage}
-          className="bg-green-500 px-4 rounded-r-lg"
+          className="bg-white text-black px-6 rounded-full"
         >
           ส่ง
         </button>
